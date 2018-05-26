@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monster Slayer</title>
+    <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+    <section class="row">
+        <div class="small-6 columns">
+            <h1 class="text-center">YOU</h1>
+            <div class="healthbar">
+                <div :class="['healthbar', 'text-center']" :style="[{width: playerHealth + '%', 'background-color': 'green', 'margin': '0', 'color': 'white'}]">
+                    <p>{{playerHealth}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="small-6 columns">
+            <h1 class="text-center">MONSTER</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" :style="[{width: monsterHealth + '%', 'background-color': 'green', margin: '0', color: 'white'}]">
+                    <p>{{monsterHealth}}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="row controls" v-if="!gameStart">
+        <div class="small-12 columns">
+            <button id="start-game" @click="gameStart = true">START NEW GAME</button>
+        </div>
+    </section>
+    <section class="row controls" v-if="gameStart">
+        <div class="small-12 columns">
+            <button id="attack" @click="attack">ATTACK</button>
+            <button id="special-attack" :disabled="!specialAttacks" @click="specialAttack" >{{specialAttackInfo}} - {{specialAttacks}} left</button>
+            <button id="heal" @click="heal">HEAL</button>
+            <button id="give-up" @click="reset">GIVE UP</button>
+            <button id="give-up" @click="resetGameLog">CLEAR SCORE</button>
+            
+        </div>
+    </section>
+    <section class="row log" v-if="gameLog[0]">
+        <div class="small-12 columns">
+            <ul v-for="log in gameLog">
+                <li class="log">
+                    <span class="player-turn">{{log.playerLog}}</span> 
+                </li>
+                <li class="log">
+                    <span class="monster-turn">{{log.monsterLog}}</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
