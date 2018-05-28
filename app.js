@@ -20,6 +20,9 @@ new Vue({
             });
             
         },
+        calculateDamage(min, max) {
+           return Math.floor(Math.random() * max) + min;
+        },
 
         checkHealth(hitOrHeal) {
             /*If the player healed himself, then we need to update the gameLog to say so */
@@ -29,31 +32,49 @@ new Vue({
                     playerLog: `Player died`,
                     monsterLog: `Monster Wins!`
                 });
-                this.reset();
-            }
-            if(this.monsterHealth <= 0) {
-                console.log("Player wins");
-                this.gameLog.unshift({
-                    playerLog: `Player Wins!`,
-                    monsterLog: `Monster slain!`
-                });
-                this.reset();
-            }
+                if(confirm("You lost! New Game?")) {
+                    this.reset();
+                    this.gameStart = true;
+                } else {
+                    this.reset();
+                }
+                return true;
+                
+            } else {
+                if (this.monsterHealth <= 0) {
+                    this.gameLog.unshift({
+                        playerLog: `Player Wins!`,
+                        monsterLog: `Monster slain!`
+                    });
+                    if(confirm("You won! New Game?")) {
+                        this.reset();
+                        this.gameStart = true;
+                    } else {
+                        this.reset();
+                    }
+                    return true;
+                }
+            } 
+            return false;
+            
         },
 
         monsterAttack(hitOrHeal) {
-            this.monsterHit = (Math.floor(Math.random() * 15) + 1);
-            this.playerHealth = this.playerHealth - this.monsterHit;
+            this.monsterHit = this.calculateDamage(1, 15);
+            this.playerHealth -= this.monsterHit;
             this.checkHealth(hitOrHeal);
         },
 
         attack(playerMove) {
+            // if(this.checkHealth()) {
+            //     return;
+            // }
             //The click on Attack sends the mouse event as the argument
             //Therefore, we need to check wheter the argument is not an object
             //In order to assign its value to this.playerHit
             //This is done so that we can use attack inside of specialAttack
-            typeof(playerMove) !== "object" ? this.playerHit = playerMove : this.playerHit = (Math.floor(Math.random() * 10) + 1);
-            this.monsterHealth = this.monsterHealth - this.playerHit;
+            typeof(playerMove) !== "object" ? this.playerHit = playerMove : this.playerHit = this.calculateDamage(1, 10);
+            this.monsterHealth -= this.playerHit;
             this.monsterAttack("attacked monster");
         },
 
@@ -63,20 +84,20 @@ new Vue({
                 this.specialAttacks = 0;
             } else {
                 this.specialAttacks--;
-                this.playerHit = (Math.floor(Math.random() * 10) + 8);
+                this.playerHit = this.calculateDamage(8, 12);
                 this.attack(this.playerHit);
             }
         },
 
         heal() {
-            this.playerHeal = (Math.floor(Math.random() * 10) + 5);
+            this.playerHeal = this.calculateDamage(5, 10)
             /*If we add the healing to the playerhealth and it's more than 100,
               We set it back to 100*/
             if((this.playerHealth + this.playerHeal) >= 100) {
                 this.playerHealth = 100;
             } else {
                 //Otherwise, we let the player heal himsel
-                this.playerHealth = this.playerHealth + this.playerHeal;
+                this.playerHealth += this.playerHeal;
             }
                 this.monsterAttack("healed self");
         },
@@ -89,6 +110,7 @@ new Vue({
             this.specialAttackInfo = "SPECIAL ATTACK";
             this.playerHit = 0;
             this.monsterHit = 0;
+            this.gameLog = [];
         },
 
         resetGameLog() {
